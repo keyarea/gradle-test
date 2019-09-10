@@ -1,0 +1,149 @@
+plugins {
+    id 'java'
+}
+
+group 'net.fangcun.gradle'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task hello1 {
+    doLast {
+        println 'hello1'
+    }
+}
+
+task hello2  {
+    doLast {
+        println 'Hello world!'
+    }
+}
+
+task upper {
+    doLast {
+        String someString = 'my_name';
+        println "Original: " + someString
+        println "UpperCase:" + someString.toUpperCase()
+    }
+}
+
+task count {
+    doLast {
+        4.times {
+            println "$it "
+        }
+    }
+}
+
+task hello {
+    doLast {
+        println "hello world"
+    }
+}
+
+// 依赖hello任务，在两个任务之间指明依赖关系
+task intro(dependsOn: hello) {
+    doLast {
+        println "i'm gradle"
+    }
+}
+
+
+// 延迟依赖
+// 注意这里的taskY需要添加'', 即：当引用的任务尚未定义的时候不可使用短标记法来运行任务。
+// 可以看到，taskX 是 在 taskY 之前定义的，这在多项目构建中非常有用。
+task taskX(dependsOn: 'taskY') {
+    doLast {
+        println "this is taskX"
+    }
+}
+
+task taskY {
+    doLast {
+        println "this is taskY"
+    }
+}
+
+// 动态任务
+
+4.times { counter ->
+    task "task$counter" {
+        doLast {
+            println "I'm task number $counter"
+        }
+    }
+
+}
+
+// 任务操纵
+
+// 通过 API 进行任务之间的通信 - 增加依赖
+task1.dependsOn task2,task3;
+
+// 通过 API 进行任务之间的通信 - 增加任务行为
+
+// doFirst 和 doLast 可以进行多次调用。他们分别被添加在任务的开头和结尾。当任务开始执行时这些动作会按照既定顺序进行。
+task task5 {
+    doLast {
+        println "i'm task4"
+    }
+}
+
+task5.doFirst {
+    println "i'm task4 doFirst"
+}
+
+task5.doLast {
+    println "i'm task4 doLast"
+}
+
+// 短标记法
+// 每个任务都是一个脚本的属性，你可以访问它:
+
+// 以属性的方式访问任务
+task task6 {
+    doLast {
+        println "i'm task6"
+    }
+}
+
+task6.doFirst {
+    println "i'm task6 first"
+}
+
+// 增加自定义属性
+// 你可以为一个任务添加额外的属性。例如,新增一个叫做 myProperty 的属性，用 ext.myProperty 的方式给他一个初始值。这样便增加了一个自定义属性。
+
+task task7 {
+    ext.myValue = "hello"
+}
+
+task task8 {
+    doLast {
+        println task7.myValue
+    }
+}
+
+// 默认任务
+// 输入gradle -q 就会默认执行clear和run两个任务
+defaultTasks 'clear', 'run'
+
+task clear {
+    doLast {
+        println "clear"
+    }
+}
+
+task run {
+    doLast {
+        println "run"
+    }
+}
